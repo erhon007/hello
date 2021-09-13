@@ -14,12 +14,12 @@ pipeline {
     stages {
         stage("First step") {
             steps {
-                sh 'root@JenkinsTest \'hostname\''
+                sh 'root@ub1 \'hostname\''
             }
         }
         stage("Second step") {
             steps {
-                sh 'ssh root@JenkinsTest \'uptime\''
+                sh 'ssh root@ub1 \'uptime\''
             }
         }
     }
