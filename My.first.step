@@ -13,11 +13,11 @@ pipeline {
     stages {
         stage("First step") {
             steps {
-                sh 'ssh root@ub1' 
-                }
-            dir ('docker/toolbox'){
+                //dir ('docker/toolbox') {
+                //sh 'ssh root@ub1' 
+                //}
                 steps ("Second step"){
-                sh 'cp AKT_PR_PER_GP2.FMB /home/aprosys'
+                sh 'curl -o /home/aprosys https://github.com/erhon007/hello/blob/master/AKT_PR_PER_GP2.FMB'
                 }
                 
             }
