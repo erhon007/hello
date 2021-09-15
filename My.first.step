@@ -2,26 +2,30 @@
 // Test
 properties([disableConcurrentBuilds()])
 
-pipeline {
-    agent { 
+pipeline 
+{
+    agent 
+	{ 
         label 'master'
-        }
-    options {
+    }
+    options 
+	{
         buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '10'))
         timestamps()
     }
-    stages {
-        stage("First step") {
-            steps {
-                //dir ('docker/toolbox') {
-                //sh 'ssh root@ub1' 
-                //}
-                steps ("Second step"){
+    stages 
+	{
+        stage("First step") 
+		{
+            steps 
+			{
+                 steps ("Second step")
+				{
                     echo "Hello"
-                //sh 'curl -o /home/aprosys https://github.com/erhon007/hello/blob/master/AKT_PR_PER_GP2.FMB'
+                
                 }
                 
             }
         }
-     }
+    }
 }
