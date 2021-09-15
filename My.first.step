@@ -17,7 +17,8 @@ pipeline {
                 //sh 'ssh root@ub1' 
                 //}
                 steps ("Second step"){
-                sh 'curl -o /home/aprosys https://github.com/erhon007/hello/blob/master/AKT_PR_PER_GP2.FMB'
+                    echo "Hello"
+                //sh 'curl -o /home/aprosys https://github.com/erhon007/hello/blob/master/AKT_PR_PER_GP2.FMB'
                 }
                 
             }
