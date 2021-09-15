@@ -13,9 +13,9 @@ pipeline {
     stages {
         stage("First step") {
             steps {
-                dir ('docker/toolbox') {
                 sh 'ssh root@ub1' 
                 }
+            dir ('docker/toolbox'){
                 steps ("Second step"){
                 sh 'cp AKT_PR_PER_GP2.FMB /home/aprosys'
                 }
