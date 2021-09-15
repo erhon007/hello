@@ -13,7 +13,10 @@ pipeline {
     stages {
         stage("First step") {
             steps {
-                sh 'ssh root@ub1 \'hostname\''
+                dir ('docker/toolbox') {
+                sh 'cp AKT_PR_PER_GP2.FMB /home'
+                }
+                
             }
         }
      }
