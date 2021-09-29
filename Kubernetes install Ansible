@@ -62,3 +62,40 @@
           EOF
    - name: systemctl restart docker
      shell: systemctl restart docker
+   - name: add Kubernetes apt-key
+     apt_key:
+       url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+   - name: add Kubernetes' APT repository
+     apt_repository:
+      repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+      filename: 'kubernetes'
+   - name: apt update_cache
+     apt: update_cache=yes
+   - name: install kubelet
+     apt:
+       name: kubelet
+       state: latest
+   - name: install kubeadm
+     apt:
+       name: kubeadm
+       state: latest
+   - name: Hold kubelet
+     dpkg_selections:
+       name: kubelet
+       selection: hold
+   - name: Hold kubeadm
+     dpkg_selections:
+       name: kubeadm
+       selection: hold
+   - name: Hold kubectl
+     dpkg_selections:
+       name: kubectl
+       selection: hold
+- hosts: master
+  become: yes
+  tasks:
+   - name: install kubectl
+     apt:
+       name: kubectl
+       state: latest
+       force: yes
