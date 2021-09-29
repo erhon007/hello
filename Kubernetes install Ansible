@@ -1,0 +1,64 @@
+- hosts: all
+  become: yes
+  tasks:
+   - name: apt update_cache
+     apt: update_cache=yes cache_valid_time=600
+   - name: curl
+     apt:
+       name: curl
+       state: latest
+   - name: install APT Transport HTTPS
+     apt:
+       name: apt-transport-https
+       state: latest
+   - name: git
+     apt:
+       name: git
+       state: latest
+   - name: iptables
+     apt:
+       name: iptables-persistent
+       state: latest
+   - name: Disable SWAP
+     shell: |
+       swapoff -a
+   - name: Disable SWAP in fstab
+     replace:
+       path: /etc/fstab
+       regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+       replace: '# \1'
+   - name: Module core
+     shell: echo br_netfilter > /etc/modules-load.d/k8s.conf | echo  overlay >> /etc/modules-load.d/k8s.conf
+   - name: Iptables bridge
+     shell: echo net.bridge.bridge-nf-call-ip6tables = 1 > /etc/modules-load.d/k8s.conf | echo net.bridge.bridge-nf-call-iptables = 1 >> /etc/modules-load.d/k8s.conf
+   - name: sysctl --system
+     shell: sysctl --system
+   - name: Ports 10250, 30000:32767
+     shell: iptables -I INPUT 1 -p tcp --match multiport --dports 6443,2379:2380,10250:10252 -j ACCEPT | netfilter-persistent save
+   - name: install Docker
+     apt:
+       name: docker
+       state: latest
+   - name: Docker IO
+     apt:
+       name: docker.io
+       state: latest
+   - name: systemctl enable docker
+     shell: systemctl enable docker
+        - name: Daemon json
+     shell: |
+         cat > /etc/docker/daemon.json << EOF
+         {
+           "exec-opts": ["native.cgroupdriver=systemd"],
+           "log-driver": "json-file",
+           "log-opts": {
+              "max-size": "100m"
+           },
+           "storage-driver": "overlay2",
+           "storage-opts": [
+              "overlay2.override_kernel_check=true"
+           ]
+          }
+          EOF
+   - name: systemctl restart docker
+     shell: systemctl restart docker
