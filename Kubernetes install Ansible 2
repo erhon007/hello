@@ -1,0 +1,123 @@
+- hosts: all
+  become: yes
+  tasks:
+   - name: apt update_cache
+     apt: update_cache=yes cache_valid_time=600
+   - name: curl
+     apt:
+       name: curl
+       state: latest
+   - name: install APT Transport HTTPS
+     apt:
+       name: apt-transport-https
+       state: latest
+   - name: wget
+     apt:
+       name: wget
+       state: latest
+   - name: gnupg
+     apt:
+       name: gnupg
+       state: latest
+   - name: ntpdate
+     apt:
+       name: ntpdate
+       state: latest
+   - name: mlocate
+     apt:
+       name: mlocate
+       state: latest
+   - name: Docker IO
+     apt:
+       name: docker.io
+       state: latest
+   - name: systemctl enable docker
+     shell: systemctl enable docker
+   - name: Tunr service docker
+     shell: updatedb | locate docker.service
+   - name: Docker Service edit
+     shell: |
+         cat > /etc/systemd/system/multi-user.target.wants/docker.service << EOF
+         [Unit]
+         Description=Docker Application Container Engine
+         Documentation=https://docs.docker.com
+         BindsTo=containerd.service
+         After=network-online.target firewalld.service containerd.service
+         Wants=network-online.target
+         Requires=docker.socket
+         [Service]
+         Type=notify
+         ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock --exec-opt native.cgroupdriver=systemd
+         ExecReload=/bin/kill -s HUP $MAINPID
+         TimeoutSec=0
+         RestartSec=2
+         Restart=always
+         StartLimitBurst=3
+         StartLimitInterval=60s
+         LimitNOFILE=infinity
+         LimitNPROC=infinity
+         LimitCORE=infinity
+         TasksMax=infinity
+         Delegate=yes
+         KillMode=process
+         [Install]
+         WantedBy=multi-user.target
+         EOF
+   - name: Iptables bridge
+     shell: echo net.bridge.bridge-nf-call-ip6tables = 1 > /etc/modules-load.d/k8s.conf | echo net.bridge.bridge-nf-call-iptables = 1 >> /etc/modules-load.d/k8s.conf | echo net.ipv4.ip_forward = 1 >> /etc/modules-load.d/k8s.conf
+   - name: sysctl --system
+     shell: sysctl --system
+   - name: Module core
+     shell: echo br_netfilter > /etc/modules-load.d/k8s.conf | echo  overlay >> /etc/modules-load.d/k8s.conf
+   - name: Disable SWAP
+     shell: |
+       swapoff -a
+   - name: Disable SWAP in fstab
+     replace:
+       path: /etc/fstab
+       regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+       replace: '# \1'
+   - name: iptables
+     apt:
+       name: iptables-persistent
+       state: latest
+   - name: Export
+     shell: export KUBECONFIG=/etc/kubernetes/admin.conf
+   - name: Add autorun Kubeadm
+     shell: echo |
+        #!/bin/bash
+        export KUBECONFIG=/etc/kubernetes/admin.conf > /etc/profile.d/kubernetes.sh
+   - name: add Kubernetes apt-key
+     apt_key:
+       url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+     apt_repository:
+      repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+      filename: 'kubernetes'
+   - name: apt update_cache
+     apt: update_cache=yes
+   - name: install kubelet
+     apt:
+       name: kubelet
+       state: latest
+   - name: install kubeadm
+     apt:
+       name: kubeadm
+       state: latest
+   - name: install kubectl
+     apt:
+       name: kubectl
+       state: latest
+       force: yes
+   - name: Image pull
+       shell: kubeadm config images pull
+- hosts: master
+  become: yes
+  tasks:
+   - name: Create init node
+     shell: kubeadm init --pod-network-cidr=10.244.0.0/16
+   - name: chmod
+     shell: chmod 644 /etc/kubernetes/admin.conf
+   - name:  Kubectl apply setting
+     raw: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+   - name: Final
+     shell: kubectl taint nodes --all node-role.kubernetes.io/master-
