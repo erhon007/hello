@@ -79,6 +79,17 @@
      apt:
        name: kubeadm
        state: latest
+- hosts: master
+  become: yes
+  tasks:
+   - name: install kubectl
+     apt:
+       name: kubectl
+       state: latest
+       force: yes
+- hosts: all
+  become: yes
+  tasks:
    - name: Hold kubelet
      dpkg_selections:
        name: kubelet
@@ -94,8 +105,9 @@
 - hosts: master
   become: yes
   tasks:
-   - name: install kubectl
-     apt:
-       name: kubectl
-       state: latest
-       force: yes
+   - name: Create init node
+     shell: kubeadm init --pod-network-cidr=10.244.0.0/16
+   - name: Export
+     shell: export KUBECONFIG=/etc/kubernetes/admin.conf
+   - name: Add autorun Kubeadm
+     shell echo export KUBECONFIG=/etc/kubernetes/admin.conf >> /etc/environment
