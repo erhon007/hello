@@ -84,12 +84,15 @@
    - name: Export
      shell: export KUBECONFIG=/etc/kubernetes/admin.conf
    - name: Add autorun Kubeadm
-     shell: echo |
+     shell: | 
+        cat > /etc/profile.d/kubernetes.sh << EOF
         #!/bin/bash
-        export KUBECONFIG=/etc/kubernetes/admin.conf > /etc/profile.d/kubernetes.sh
+        export KUBECONFIG=/etc/kubernetes/admin.conf
+        EOF
    - name: add Kubernetes apt-key
      apt_key:
        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+   - name: add Kubernetes' APT repository
      apt_repository:
       repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
       filename: 'kubernetes'
