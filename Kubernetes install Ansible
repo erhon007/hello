@@ -111,3 +111,5 @@
      shell: export KUBECONFIG=/etc/kubernetes/admin.conf
    - name: Add autorun Kubeadm
      shell echo export KUBECONFIG=/etc/kubernetes/admin.conf >> /etc/environment
+   - name: Kubectl apply setting
+     shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
