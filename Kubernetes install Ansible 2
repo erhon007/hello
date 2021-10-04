@@ -70,8 +70,7 @@
    - name: Module core
      shell: echo br_netfilter > /etc/modules-load.d/k8s.conf | echo  overlay >> /etc/modules-load.d/k8s.conf
    - name: Disable SWAP
-     shell: |
-       swapoff -a
+     shell: swapoff -a
    - name: Disable SWAP in fstab
      replace:
        path: /etc/fstab
@@ -84,7 +83,7 @@
    - name: Export
      shell: export KUBECONFIG=/etc/kubernetes/admin.conf
    - name: Add autorun Kubeadm
-     shell: | 
+     shell: |
         cat > /etc/profile.d/kubernetes.sh << EOF
         #!/bin/bash
         export KUBECONFIG=/etc/kubernetes/admin.conf
@@ -92,7 +91,6 @@
    - name: add Kubernetes apt-key
      apt_key:
        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-   - name: add Kubernetes' APT repository
      apt_repository:
       repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
       filename: 'kubernetes'
@@ -112,7 +110,7 @@
        state: latest
        force: yes
    - name: Image pull
-       shell: kubeadm config images pull
+     shell: kubeadm config images pull
 - hosts: master
   become: yes
   tasks:
