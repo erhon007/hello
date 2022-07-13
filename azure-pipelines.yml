@@ -1,3 +1,17 @@
-- task: Bash@3
-  inputs:
-    filePath: 'mkdir `date +%d%m%Y`'
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Create resource group
+      azure_rm_resourcegroup:
+        name: rg-cs-ansible
+        location: westeurope
+      register: rg
+    - name: Output
+      debug:
+        msg: "{{ rg }}"
+    - name: Output resource group name
+      debug:
+        msg: "The resource group name is {{ rg.state.name }}"
+    - name:
+      set_fact:
+      rgname: "{{ rg.state.name }}"
