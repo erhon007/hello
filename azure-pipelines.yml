@@ -1,12 +1,3 @@
-pipeline {
-  agent any
-  stages {
-    stage ('My-jenkinsBuild-Steps') {
-      steps {
-        echo "Start"
-        echo "Doing something.."
-        echo "End"
-      }
-    }
-  }
-}
+- task: Bash@3
+  inputs:
+    filePath: 'mkdir `date +%d%m%Y`'
