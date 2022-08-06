@@ -1,0 +1,67 @@
+Все задания выполнять в терминале, без графического интерфейса,
+ОС: CentOS 8 Stream или аналог.
+Создать новый каталог dir1 и несколько файлов в нем (file1, file2, file3). Сделать копию каталога dir1 с именем dir2. Переименовать каталог dir1 в dir3. Переместить каталог dir3 в каталог dir2. Удалить все файлы в каталоге dir2.
+mkdir dir1 touch /dir1/file1 file2 file3
+cp /dir1/* /dir2/
+mv /dir1 /dir3 
+mv /dir3 /dir2
+rm /dir2/*
+
+Перейдите в каталог /etc/ и выполните команду ls -la. Прокомментируйте ее вывод (файлы, папки, права, символьные ссылки и прочее) 
+ls -p | grep -v / 
+ls -d */ 
+ls -l | grep "^-"
+
+В каталоге /usr найти все файлы, изменённые в течении последних трех дней, размером более 5 MB
+
+Вы не знаете root-пароль на сервере. Сбросьте его и задайте новый.
+Через LiveCD 
+sudo fdisk -l
+sudo mkdir /media/test
+sudo mount /dev/sda3 /media/test
+sudo chroot /media/test
+sudo passwd root
+
+Создайте пользователя user1500 c UID 4500 и домашней папкой /tmp/user1500
+useradd -u 4500 -m -d /tmp/user1500 user1500 
+
+Давайте обновим все системные пакеты, связанные с python3. Прокомментируйте этот процесс как можно более подробно. Объясните, что происходит.
+
+Проверьте, какие порты слушаются сейчас на сервере. Прокомментируйте.
+netstat -tulpan
+
+Напишите bash скрипт, который принимает на вход один аргумент - число. Он сравнивает это число с 0. Если оно больше 0, то скрипт выводит на экран сообщение о том, число положительное. В противном случае работа скрипта должна завершиться с ненулевым кодом ответа и текстом ошибки на экране.
+/usr/bin/find /dir1/ -type f -size 0 -exec ls -lh {} \; | awk '{ print "error " $9 ": " $5 }'
+/usr/bin/find /dir1 -type f -size +0 -exec ls -lh {} \; | awk '{ print "true " $9  ": " $5 }'
+Выберите свободный неразмеченный диск размером 1 гбайт и поделите его на два раздела: один размером 300 мбайт, другой 700 мбайт. Используйте любую удобную вам утилиту.
+Gnome partition
+Установите веб-сервер nginx или apache (или если хотите любой другой) и настройте для него следующее поведение: Если на сервер приходит https-запрос для домена имя-домена, показывать содержимое папки /var/www/имя-домена Создайте эту папку и добавьте в нее произвольный html-файл.
+nano /etc/apache2/apache2.conf
+
+<Directory /var/www/имя-домена>
+AllowOverride All
+</Directory>
+
+vi /etc/apache2/sites-enabled/000-default.conf
+
+<VirtualHost *:80>
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/имя-домена
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+<VirtualHost *:443>
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/имя-домена
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+        SSLEngine on
+        SSLCertificateFile /etc/apache2/certificate/apache-certificate.crt
+        SSLCertificateKeyFile /etc/apache2/certificate/apache.key
+</VirtualHost>
+
+С помощью ansible создайте на сервере нового пользователя ansible-user, у него должна быть своя папка, uid 4500, /bin/bash в качестве шелла и у него должна быть привилегия подниматься до суперпользователя.
+Задайте этому пользователю случайны пароль, выведите его на экран при выполнении плейбука.
+В кластере k8s создайте replicaset с заданными в yaml-файле параметрами. Проверьте на каких нодах создались поды.
+Увеличьте количество подов. Добавьте еще один посторонний под вручную и сделайте так, чтобы он вошел под контроль репликасета.
+Что будет если этот под окажется “лишним”? То есть если при его добавлении в репликасет количество подов в нем будет больше, чем максимальное, заданное параметром replicas.
