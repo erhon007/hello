@@ -78,14 +78,14 @@ vi /etc/apache2/sites-enabled/000-default.conf
    - name: Create a login user
         user:
           name: user1500
-          password: 123456
-		  uid: 4500
-		  shell: /bin/bash
+          password: "{{ lookup('password', '/tmp/passwordfile length=8 chars=digits') }}"
+	  uid: 4500
+	  shell: /bin/bash
           groups:
-            - root
-			- sudo
+           - root
+	   - sudo
           state: present
-		  createhome: yes        
+	  createhome: yes        
           home: /tmp/user1500
 		  
 
