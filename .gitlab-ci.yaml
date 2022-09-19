@@ -1,0 +1,32 @@
+
+stages:
+    
+    - deploy
+    - build
+build docker image:
+    image: docker
+    stage: build
+    services:
+        - docker:dind
+    variables:
+        DOCKER_TLS_CERTDIR: ""
+    
+    script:
+    - docker login -u erhon -p $ACCESS_TOKEN
+    - docker tag docker erhon/my_nginx_test
+    - docker push erhon/my_nginx_test
+    - docker pull erhon/my_nginx_test
+
+deploy:
+  stage: deploy
+  image: dtzar/helm-kubectl
+
+  script:
+    - kubectl config set-cluster k8s --server="${SERVER}"
+    - kubectl config set clusters.k8s.certificate-authority-data ${CERTIFICATE_AUTHORITY_DATA}
+    - kubectl config set-credentials root --token="${USER_TOKEN}"
+    - kubectl config set-context default --cluster=k8s --user=root
+    - kubectl config use-context default
+ #   - sed -i "s/<VERSION>/${CI_COMMIT_SHORT_SHA}/g" deployment.yaml
+ #   - kubectl apply -f deployment.yaml
+    - kubectl get pods
