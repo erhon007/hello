@@ -1,0 +1,22 @@
+{
+        "admin_server": {
+                "listen_url": "0.0.0.0:3333",
+                "use_tls": true,
+                "cert_path": "/etc/ssl/certs/wldn.crt",
+                "key_path": "/etc/ssl/private/wldn.key"
+        },
+        "phish_server": {
+                "listen_url": "0.0.0.0:88",
+                "use_tls": true,
+                "cert_path": "/etc/ssl/certs/wldn.crt",
+                "key_path": "/etc/ssl/private/wldn.key"
+        },
+        "db_name": "mysql",
+        "db_path": "phisher:dJW8jd5$b!Ol@(wldn_mysql:3306)/gophish?charset=utf8&parseTime=True&loc=UTC",
+        "migrations_prefix": "db/db_",
+        "contact_address": "",
+        "logging": {
+                "filename": "",
+                "level": ""
+        }
+}
