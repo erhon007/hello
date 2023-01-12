@@ -1,23 +1,35 @@
-
-version: "3.9"
-services:
-  grafana:
-    image: grafana/grafana:8.0.6-ubuntu
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - grafana-configs:/etc/grafana
-  prometheus:
-    image: prom/prometheus:v2.28.1
-    ports:
-      - "9090:9090"
-    volumes:
-      - prom-data:/prometheus
-      - prom-configs:/etc/prometheus
+version: '3'
 
 volumes:
-  grafana-data:
-  grafana-configs:
-  prom-data:
-  prom-configs:
+  nginx_conf:
+  lms_data:
+  mysql_data:
+  ssl:
+
+services:
+  wldn_nginx:
+    image: deb.wldn.kz:8443/welldone/nginx:1
+    container_name: wldn_nginx
+    volumes:
+      - nginx_conf:/etc/nginx
+      - ./config.php:/var/www/lms/config.php
+      - lms_data:/opt/lmsdata/
+      - ssl:/etc/ssl/
+    ports:
+      - "80:80"
+      - "443:443"
+  wldn_mysql:
+    image: deb.wldn.kz:8443/welldone/mysql:1
+    container_name: wldn_mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - "mysql_data:/var/lib/mysql"
+  wldn_gophish:
+    image: deb.wldn.kz:8443/welldone/gophish:1
+    container_name: wldn_gophish
+    ports:
+      - "3333:3333"
+      - "88:88"
+    volumes:
+     - ./config.json:/opt/gophish/config.json
